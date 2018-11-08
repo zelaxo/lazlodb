@@ -44,8 +44,24 @@ lazlo
 lazlo
     .command('list db', 'Lists all the databases within the current data source')
     .action(function(args,cb) {
-        for(let i=0;i<db_tracker.length;i++)
-            lazlo.log(db_tracker[i]);
+        if(db_tracker.length===0) {
+            lazlo.log(chalk.red.bold('No databases found !'));
+        }
+        else {
+            let dbname;
+            let logCount = 0;
+            for(let i=0;i<db_tracker.length;i++) {
+                dbname = db_tracker[i];
+                if(fs.existsSync(`${process.env.LAZLO_SOURCE}/${dbname}`)) {
+                    lazlo.log(dbname);
+                    logCount++;
+                }
+            }
+            //Malicious deletion detect
+            let d = db_tracker.length - logCount;
+            if(d===0) {/* db count syncs with tracker */}
+            else {lazlo.log(chalk.yellow.bgRed.bold(`BREACH DETECTED : ${d} databases have been manually or maliciously deleted`))}
+        }
         cb();
     });
 
