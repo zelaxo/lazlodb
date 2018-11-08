@@ -1,0 +1,17 @@
+{
+  "name": "lazlo",
+  "version": "1.0.0",
+  "main": "main.js",
+  "repository": "https://github.com/zaygozi/Lazlo.git",
+  "author": "zaygo <zaygo@mail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "dotenv": "^6.1.0",
+    "list-contents": "^4.0.2",
+    "lodash": "^4.17.11",
+    "mkdirp": "^0.5.1",
+    "path": "^0.12.7",
+    "vorpal": "^1.12.0"
+  }
+}
