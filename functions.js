@@ -11,12 +11,19 @@ global.db_tracker = null;
 //Set Data Source
 function setsrc(src,callback) {
     let msg;
-    if(fs.existsSync(src)) {
+    if(fs.existsSync(src) && src!==process.env.LAZLO_SOURCE) {
         process.env.LAZLO_SOURCE = src;
         fs.writeFileSync('.env',`LAZLO_SOURCE=${src}`);
+        fs.writeFileSync('./db_tracker.txt','');
+        db_tracker = [];
         msg = `Data source set to ${process.env.LAZLO_SOURCE}`;
         if (callback)
             callback(chalk.green.bold(msg))
+    }
+    else if(src===process.env.LAZLO_SOURCE) {
+        msg = 'You are currently accessing the same data source';
+        if (callback)
+            callback(chalk.red.bold(msg))
     }
     else {
         msg = 'Not a valid path';
@@ -71,3 +78,26 @@ function selectDb(dbname,callback) {
     }
 }
 module.exports.selectDb = selectDb;
+
+//Track DB
+function trackdb(dbname,callback) {
+    let msg;
+    let p = `${process.env.LAZLO_SOURCE}/${dbname}`;
+    if(fs.existsSync(p)) {
+        msg = `Database ${dbname} is being tracked`;
+        fs.appendFileSync('db_tracker.txt',dbname+'\n');
+        let text = fs.readFileSync('./db_tracker.txt').toString();
+        if (text === null) {} else  {
+            db_tracker = text.split("\n");
+            db_tracker.pop();
+        }
+        if(callback)
+            callback(chalk.green.bold(msg))
+    }
+    else {
+        msg = `Database ${dbname} does not exist in the current data source`;
+        if(callback)
+            callback(chalk.red.bold(msg))
+    }
+}
+module.exports.trackdb = trackdb;

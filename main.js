@@ -77,6 +77,16 @@ lazlo
     });
 
 lazlo
+    .command('track <dbname>', 'Track a databse')
+    .action(function(args,cb) {
+        let dbname = args.dbname;
+        functions.trackdb(dbname,function(msg) {
+            lazlo.log(msg);
+        });
+        cb();
+    });
+
+lazlo
     .delimiter(chalk.magenta.bold('lazlo =>'))
     .log(chalk.red.bold(`ATTENTION : CURRENT DATA SOURCE IS ${process.env.LAZLO_SOURCE}`))
     .log(chalk.green.bold('Use "set source" command to change data source'))
