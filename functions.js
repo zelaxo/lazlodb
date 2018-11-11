@@ -1,12 +1,9 @@
 require('dotenv').config();
 const mkdir = require('mkdirp');
+const rimraf = require('rimraf');
 const fs = require('fs');
 const chalk = require('chalk');
-const array = require('lodash/array');
-
-//Global namespace
-global.db = null;
-global.db_tracker = null;
+const lodash = require('lodash');
 
 //Set Data Source
 function setsrc(src,callback) {
@@ -65,7 +62,7 @@ module.exports.createDb = createDb;
 function selectDb(dbname,callback) {
     let msg;
     let p = `${process.env.LAZLO_SOURCE}/${dbname}`;
-    if(fs.existsSync(p)) {
+    if(fs.existsSync(p) && lodash.find(db_tracker,dbname)) {
         db = dbname;
         msg = `Accessing database ${db}`;
         if(callback)
@@ -101,3 +98,64 @@ function trackdb(dbname,callback) {
     }
 }
 module.exports.trackdb = trackdb;
+
+//Untrack DB
+function untrack(dbname,callback) {
+    let msg;
+    if(lodash.includes(db_tracker,dbname)) {
+       lodash.remove(db_tracker,function (element) {
+           return element === dbname;
+       });
+        if(db_tracker.length !== 0) {
+            fs.truncateSync('./db_tracker.txt');
+            for(let i=0;i<db_tracker.length;i++) {
+                fs.appendFileSync('./db_tracker.txt',db_tracker[i] + "\n");
+            }
+        }
+        else {
+            fs.truncateSync('./db_tracker.txt');
+        }
+        msg = `Stopped tracking ${dbname}`;
+        if (callback)
+            callback(chalk.green.bold(msg))
+    }
+    else {
+        msg = `${dbname} was not being tracked`;
+        if (callback)
+            callback(chalk.red.bold(msg))
+    }
+}
+module.exports.untrack = untrack;
+
+//Delete DB
+function deldb(dbname,callback) {
+    let msg;
+    if (fs.existsSync(`${process.env.LAZLO_SOURCE}/${dbname}`) && lodash.includes(db_tracker, dbname)) {
+        let p = `${process.env.LAZLO_SOURCE}/${dbname}`;
+        msg = `Database ${dbname} has been deleted`;
+        rimraf(p,function (err) {
+           if (callback)
+               callback(err?err : null, err?null : chalk.green.bold(msg));
+            if (!err) {
+                lodash.remove(db_tracker,function (element) {
+                    return element === dbname;
+                });
+                if(db_tracker.length !== 0) {
+                    fs.truncateSync('./db_tracker.txt');
+                    for(let i=0;i<db_tracker.length;i++) {
+                        fs.appendFileSync('./db_tracker.txt',db_tracker[i] + "\n");
+                    }
+                }
+                else {
+                    fs.truncateSync('./db_tracker.txt');
+                }
+            }
+        });
+    }
+    else {
+        msg = `Database ${dbname} does not exist`;
+        if (callback)
+            callback(null, chalk.red.bold(msg))
+    }
+}
+module.exports.deldb = deldb;

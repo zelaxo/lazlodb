@@ -1,9 +1,12 @@
 require('dotenv').config();
 const lazlo = require('vorpal')();
 const {chalk} = lazlo;
-const listcon = require('list-contents');
 const fs = require('fs');
 const functions = require('./functions');
+
+//Global namespace
+global.db = null;
+global.db_tracker = null;
 
 //Reading db_tracker log
 let text = fs.readFileSync('./db_tracker.txt').toString();
@@ -77,10 +80,32 @@ lazlo
     });
 
 lazlo
-    .command('track <dbname>', 'Track a databse')
+    .command('track <dbname>', 'Track a database')
     .action(function(args,cb) {
         let dbname = args.dbname;
         functions.trackdb(dbname,function(msg) {
+            lazlo.log(msg);
+        });
+        cb();
+    });
+
+lazlo
+    .command('untrack <dbname>', 'Untrack a database')
+    .action(function(args,cb) {
+        let dbname = args.dbname;
+        functions.untrack(dbname,function (msg) {
+            lazlo.log(msg);
+        });
+        cb();
+    });
+
+lazlo
+    .command('delete db <dbname>', 'Delete database')
+    .alias('drop')
+    .action(function(args,cb) {
+        let dbname = args.dbname;
+        functions.deldb(dbname,function(err,msg) {
+            if (err) lazlo.log(err);
             lazlo.log(msg);
         });
         cb();
