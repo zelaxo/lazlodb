@@ -11,7 +11,7 @@
     "list-contents": "^4.0.2",
     "lodash": "^4.17.11",
     "mkdirp": "^0.5.1",
-    "path": "^0.12.7",
+    "msgpack-lite": "^0.1.26",
     "rimraf": "^2.6.2",
     "vorpal": "^1.12.0"
   }

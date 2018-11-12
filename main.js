@@ -2,7 +2,10 @@ require('dotenv').config();
 const lazlo = require('vorpal')();
 const {chalk} = lazlo;
 const fs = require('fs');
+const listcon = require('list-contents');
+const path = require('path');
 const functions = require('./functions');
+const docfn = require('./doc-functions');
 
 //Global namespace
 global.db = null;
@@ -110,6 +113,42 @@ lazlo
         });
         cb();
     });
+
+//*********START OF DOCUMENT COMMANDS************//
+
+lazlo
+    .command('newdoc <docname>', 'Create new document')
+    .alias('create doc')
+    .action(function(args,cb) {
+        let docname = args.docname;
+        docfn.newdoc(docname,function(msg) {
+            lazlo.log(msg);
+        });
+        cb();
+    });
+
+lazlo
+    .command('list doc', 'List all documents in the database')
+    .alias('docs')
+    .action(function(args,cb) {
+            let msg;
+            if(db !== null) {
+                let p = `${process.env.LAZLO_SOURCE}/${db}`;
+                listcon(p,{depth:1, exclude:['buckets']},(o) => {
+                    if (o.error) throw o.error;
+                    let output = o.files;
+                    for(let i=0;i<output.length;i++) {
+                        msg = path.basename(output[i],'.laz');
+                        lazlo.log(msg);
+                    }
+                });
+            }
+            else {
+                msg = `No database selected !`;
+                lazlo.log(chalk.red.bold(msg));
+            }
+            cb();
+        });
 
 lazlo
     .delimiter(chalk.magenta.bold('lazlo =>'))

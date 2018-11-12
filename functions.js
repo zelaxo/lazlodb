@@ -62,7 +62,7 @@ module.exports.createDb = createDb;
 function selectDb(dbname,callback) {
     let msg;
     let p = `${process.env.LAZLO_SOURCE}/${dbname}`;
-    if(fs.existsSync(p) && lodash.find(db_tracker,dbname)) {
+    if(fs.existsSync(p) && lodash.includes(db_tracker,dbname)) {
         db = dbname;
         msg = `Accessing database ${db}`;
         if(callback)
