@@ -137,9 +137,15 @@ lazlo
                 listcon(p,{depth:1, exclude:['buckets']},(o) => {
                     if (o.error) throw o.error;
                     let output = o.files;
-                    for(let i=0;i<output.length;i++) {
-                        msg = path.basename(output[i],'.laz');
-                        lazlo.log(msg);
+                    if(output.length !== 0) {
+                        for(let i=0;i<output.length;i++) {
+                            msg = path.basename(output[i],'.laz');
+                            lazlo.log(msg);
+                        }
+                    }
+                    else {
+                        msg = 'No documents found !';
+                        lazlo.log(chalk.bold.red(msg));
                     }
                 });
             }
@@ -149,6 +155,38 @@ lazlo
             }
             cb();
         });
+
+lazlo
+    .command('insert into <docname> <object>', 'Insert single data into document')
+    .action(function(args,cb) {
+        let object = args.object;
+        let docname = args.docname;
+        docfn.inserts(docname,object,(msg) => {
+            lazlo.log(msg);
+        });
+        cb();
+    });
+
+lazlo
+    .command('insert many into <docname> <array>', 'Insert multiple data into document')
+    .action(function(args,cb) {
+        let array = args.array;
+        let docname = args.docname;
+        docfn.insert(docname,array,(msg) => {
+            lazlo.log(msg);
+        });
+        cb();
+    });
+
+lazlo
+    .command('show all from <docname>', 'Display data in the document')
+    .action(function (args,cb) {
+        let docname = args.docname;
+        docfn.show(docname,(msg) => {
+            lazlo.log(msg);
+        });
+        cb();
+    });
 
 lazlo
     .delimiter(chalk.magenta.bold('lazlo =>'))

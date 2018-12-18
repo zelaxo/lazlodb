@@ -137,6 +137,7 @@ function deldb(dbname,callback) {
            if (callback)
                callback(err?err : null, err?null : chalk.green.bold(msg));
             if (!err) {
+                db = null;
                 lodash.remove(db_tracker,function (element) {
                     return element === dbname;
                 });
