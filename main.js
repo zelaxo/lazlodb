@@ -8,8 +8,10 @@ const functions = require('./functions');
 const docfn = require('./doc-functions');
 
 //Global namespace
-global.db = null;
+global.db = null;  //Stores db name being currently used
 global.db_tracker = null;
+global.cache = [];
+global.current_doc = null;  //Stores doc name being currently used
 
 //Reading db_tracker log
 let text = fs.readFileSync('./db_tracker.txt').toString();
@@ -122,6 +124,17 @@ lazlo
     .action(function(args,cb) {
         let docname = args.docname;
         docfn.newdoc(docname,function(msg) {
+            lazlo.log(msg);
+        });
+        cb();
+    });
+
+lazlo
+    .command('delete doc <docname>', 'Delete document')
+    .alias('remove doc')
+    .action(function (args,cb) {
+        let docname = args.docname;
+        docfn.deldoc(docname,function(msg) {
             lazlo.log(msg);
         });
         cb();
