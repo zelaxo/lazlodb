@@ -1,4 +1,5 @@
-require('dotenv').config();
+const ejf = require('edit-json-file');
+let config = ejf('./.config.json');
 const mkdir = require('mkdirp');
 const rimraf = require('rimraf');
 const fs = require('fs');
@@ -9,8 +10,9 @@ const lodash = require('lodash');
 function setsrc(src,callback) {
     let msg;
     if(fs.existsSync(src) && src!==process.env.LAZLO_SOURCE) {
+        config.set("db_src",src);
+        config.save();
         process.env.LAZLO_SOURCE = src;
-        fs.writeFileSync('.env',`LAZLO_SOURCE=${src}`);
         fs.writeFileSync('./db_tracker.txt','');
         db_tracker = [];
         msg = `Data source set to ${process.env.LAZLO_SOURCE}`;

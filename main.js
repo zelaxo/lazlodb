@@ -1,11 +1,16 @@
-require('dotenv').config();
 const lazlo = require('vorpal')();
+const ejf = require('edit-json-file');
+let config = ejf('./.config.json');
 const {chalk} = lazlo;
 const fs = require('fs');
 const listcon = require('list-contents');
 const path = require('path');
 const functions = require('./functions');
 const docfn = require('./doc-functions');
+const sad = require('./slice&dice');
+
+//Environment Variables
+process.env.LAZLO_SOURCE = config.get("db_src");
 
 //Global namespace
 global.db = null;  //Stores db name being currently used
@@ -198,6 +203,25 @@ lazlo
         docfn.show(docname,(msg) => {
             lazlo.log(msg);
         });
+        cb();
+    });
+
+lazlo
+    .command('show from <docname> <where> <prop> <operator> <val>', 'Compare properties to values')
+    .action(function(args,cb) {
+        let docname = args.docname;
+        let where = args.where;
+        let prop = args.prop;
+        let operator = args.operator;
+        let val = args.val;
+        if(where === 'where') {
+            sad.whereClause(docname,prop,operator,val,(msg) => {
+                lazlo.log(msg);
+            })
+        } else {
+            let msg = 'Synatactical error detected !';
+            lazlo.log(msg);
+        }
         cb();
     });
 
