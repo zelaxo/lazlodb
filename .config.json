@@ -1,7 +1,6 @@
 {
   "db_src": "C://Users/arjun/Documents",
   "logs": {
-    "lazlo_log": "./logs/lazlo.log",
-    "custom_log": null
+    "lazlo_log": "./logs/lazlo.log"
   }
 }

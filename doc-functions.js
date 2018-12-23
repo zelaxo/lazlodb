@@ -1,6 +1,9 @@
 const fs = require('fs');
 const chalk = require('chalk');
 const msgpack = require('msgpack-lite');
+const lodash = require('lodash');
+
+const cfn = require('./common-functions');
 
 //Create doc
 function newdoc(docname, callback) {
@@ -15,7 +18,8 @@ function newdoc(docname, callback) {
             fs.writeFileSync(p, '');
             msg = `Document ${docname} created !`;
             if (callback)
-                callback(chalk.green.bold(msg))
+                callback(chalk.green.bold(msg));
+            cfn.docCreationLog(docname,db);
         }
     } else {
         msg = `No database selected !`;
@@ -35,7 +39,8 @@ function deldoc(docname, callback) {
             fs.unlinkSync(p);
             msg = 'Document deleted !';
             if (callback)
-                callback(chalk.green.bold(msg))
+                callback(chalk.green.bold(msg));
+            cfn.docDeletionLog(docname,db);
         } else {
             msg = 'Document does not exist !';
             if (callback)
@@ -65,6 +70,7 @@ function inserts(docname, input, callback) {
         }
         if (cache.length !== 0 && current_doc === docname) {
             //Using preloaded cache data for fast insertion
+            object._id = cfn.idgen();
             cache.push(object);
             let buffer = msgpack.encode(cache);
             fs.writeFile(p, buffer, (err) => {
@@ -73,6 +79,7 @@ function inserts(docname, input, callback) {
             msg = 'Data inserted !';
             if (callback)
                 callback((chalk.green.bold(msg)));
+            cfn.docEntryLog(1,docname,true);
         } else {
             //Normal Insertion
             if (fs.statSync(p).size !== 0) {
@@ -80,6 +87,7 @@ function inserts(docname, input, callback) {
                 cache = msgpack.decode(buffer);
             }
             current_doc = docname;
+            object._id = cfn.idgen();
             cache.push(object);
             let buffer = msgpack.encode(cache);
             fs.writeFile(p, buffer, (err) => {
@@ -88,6 +96,7 @@ function inserts(docname, input, callback) {
             msg = 'Data inserted !';
             if (callback)
                 callback((chalk.green.bold(msg)));
+            cfn.docEntryLog(1,docname,true);
         }
     } else {
         msg = 'No database selected or the document does not exist !';
@@ -114,6 +123,7 @@ function insert(docname, input, callback) {
         if (cache.length !== 0 && current_doc === docname) {
             //Using preloaded cache data for fast insertion
             array.forEach((object) => {
+                object._id = cfn.idgen();
                 cache.push(object);
             });
             let buffer = msgpack.encode(cache);
@@ -123,6 +133,7 @@ function insert(docname, input, callback) {
             msg = 'Data inserted !';
             if (callback)
                 callback((chalk.green.bold(msg)));
+            cfn.docEntryLog(array.length,docname,true);
         } else {
             //Normal Insertion
             if (fs.statSync(p).size !== 0) {
@@ -131,6 +142,7 @@ function insert(docname, input, callback) {
             }
             current_doc = docname;
             array.forEach((object) => {
+                object._id = cfn.idgen();
                 cache.push(object);
             });
             let buffer = msgpack.encode(cache);
@@ -140,6 +152,7 @@ function insert(docname, input, callback) {
             msg = 'Data inserted !';
             if (callback)
                 callback((chalk.green.bold(msg)));
+            cfn.docEntryLog(array.length,docname,true);
         }
     } else {
         msg = 'No database selected or the document does not exist !';
@@ -157,10 +170,8 @@ function show(docname, callback) {
     if (db !== null && fs.existsSync(p)) {
         if (cache.length !== 0 && current_doc === docname) {
             //Fast retrieval using cache
-            cache.forEach((object) => {
-                if (callback)
-                    callback(object);
-            })
+            if(callback)
+                callback(cache)
         } else {
             //Normal retrieval
             if (fs.statSync(p).size !== 0) {
@@ -173,10 +184,8 @@ function show(docname, callback) {
                         cache = msgpack.decode(data);
                         if (typeof cache === "object") {
                             current_doc = docname;
-                            cache.forEach((object) => {
-                                if (callback)
-                                    callback(object);
-                            })
+                            if(callback)
+                                callback(cache)
                         } else {
                             current_doc = null;
                             msg = 'Data seems to be corrupted !';
@@ -198,3 +207,186 @@ function show(docname, callback) {
     }
 }
 module.exports.show = show;
+
+//update data (update in doc where ipar = ivalue as par = value)
+function updateDoc(docname,ipar,ivalue,par,value,callback) {
+    let msg;
+    let output = [];
+    let p = `${process.env.LAZLO_SOURCE}/${db}/${docname}.laz`;
+    if (db !== null && fs.existsSync(p)) {
+        if (cache.length !== 0 && current_doc === docname) {
+            //fast updation using cache
+            cache.forEach((obj) => {
+                if(obj[ipar] === ivalue) {
+                    obj[par] = value;
+                    output.push(obj);
+                    cfn.docUpdateLog(obj._id,docname);
+                }
+            });
+            let buffer = msgpack.encode(cache);
+            fs.writeFile(p, buffer, (err) => {
+                if (err) throw err;
+            });
+            if(output.length === 0) {msg = 'No record with matching key-value pair found !'}
+            else {msg = `${output.length} records updated !`}
+            if(callback)
+                callback(msg,output)
+        } else {
+            //normal updation
+            if (fs.statSync(p).size !== 0) {
+                fs.readFile(p, (err, data) => {
+                    if (err) {
+                        msg = 'Data seems to be corrupted !';
+                        if (callback)
+                            callback((chalk.red.bold(msg)));
+                    } else {
+                        cache = msgpack.decode(data);
+                        current_doc = docname;
+                        cache.forEach((obj) => {
+                            if(obj[ipar] === ivalue) {
+                                obj[par] = value;
+                                output.push(obj);
+                                cfn.docUpdateLog(obj._id,docname);
+                            }
+                        });
+                        let buffer = msgpack.encode(cache);
+                        fs.writeFile(p, buffer, (err) => {
+                            if (err) throw err;
+                        });
+                        if(output.length === 0) {msg = 'No record with matching key-value pair found !'}
+                        else {msg = `${output.length} records updated !`}
+                        if(callback)
+                            callback(msg,output)
+                    }
+                });
+            } else {
+                msg = 'Document is empty !';
+                if (callback)
+                    callback((chalk.red.bold(msg)));
+            }
+        }
+    } else {
+        msg = 'No database selected or the document does not exist !';
+        if (callback)
+            callback((chalk.red.bold(msg)));
+    }
+}
+module.exports.updateDoc = updateDoc;
+
+//delete data (delete from doc where par = value)
+function delData(docname,par,value,callback) {
+    let msg;
+    let output = [];
+    let p = `${process.env.LAZLO_SOURCE}/${db}/${docname}.laz`;
+    if (db !== null && fs.existsSync(p)) {
+        if (cache.length !== 0 && current_doc === docname) {
+            //fast deletion using cache
+            output = lodash.remove(cache, (obj) => {
+                return obj[par] === value;
+            });
+            if(output.length === 0) {
+                msg = 'No record with matching key-value pair found !'
+            }
+            else {
+                let buffer = msgpack.encode(cache);
+                fs.writeFile(p, buffer, (err) => {
+                    if (err) throw err;
+                });
+                msg = `${output.length} records deleted !`;
+                cfn.docEntryLog(output.length,docname,false);
+            }
+            if(callback)
+                callback(msg,output)
+        } else {
+            //normal deletion
+            if (fs.statSync(p).size !== 0) {
+                fs.readFile(p, (err, data) => {
+                    if (err) {
+                        msg = 'Data seems to be corrupted !';
+                        if (callback)
+                            callback((chalk.red.bold(msg)));
+                    } else {
+                        cache = msgpack.decode(data);
+                        current_doc = docname;
+                        output = lodash.remove(cache, (obj) => {
+                            return obj[par] === value;
+                        });
+                        if(output.length === 0) {
+                            msg = 'No record with matching key-value pair found !'
+                        }
+                        else {
+                            let buffer = msgpack.encode(cache);
+                            fs.writeFile(p, buffer, (err) => {
+                                if (err) throw err;
+                            });
+                            msg = `${output.length} records deleted !`;
+                            cfn.docEntryLog(output.length,docname,false);
+                        }
+                        if(callback)
+                            callback(msg,output)
+                    }
+                });
+            } else {
+                msg = 'Document is empty !';
+                if (callback)
+                    callback((chalk.red.bold(msg)));
+            }
+        }
+    } else {
+        msg = 'No database selected or the document does not exist !';
+        if (callback)
+            callback((chalk.red.bold(msg)));
+    }
+}
+module.exports.delData = delData;
+
+//records by date (show records of date from doc)
+function recordsByDate(date,docname,callback) {
+    let msg;
+    let output = [];
+    let p = `${process.env.LAZLO_SOURCE}/${db}/${docname}.laz`;
+    if (db !== null && fs.existsSync(p)) {
+        if (cache.length !== 0 && current_doc === docname) {
+            //fast retrieval using cache
+            cache.forEach((obj) => {
+                if((obj._id).includes(date)) {
+                    output.push(obj);
+                }
+            });
+            msg = `Found ${output.length} records !`;
+            if (callback)
+                callback(msg,output)
+        } else {
+            //normal retrieval
+            if (fs.statSync(p).size !== 0) {
+                fs.readFile(p, (err, data) => {
+                    if (err) {
+                        msg = 'Data seems to be corrupted !';
+                        if (callback)
+                            callback((chalk.red.bold(msg)));
+                    } else {
+                        cache = msgpack.decode(data);
+                        current_doc = docname;
+                        cache.forEach((obj) => {
+                            if((obj._id).includes(date)) {
+                                output.push(obj);
+                            }
+                        });
+                        msg = `Found ${output.length} records !`;
+                        if (callback)
+                            callback(msg,output)
+                    }
+                });
+            } else {
+                msg = 'Document is empty !';
+                if (callback)
+                    callback((chalk.red.bold(msg)));
+            }
+        }
+    } else {
+        msg = 'No database selected or the document does not exist !';
+        if (callback)
+            callback((chalk.red.bold(msg)));
+    }
+}
+module.exports.recordsByDate = recordsByDate;

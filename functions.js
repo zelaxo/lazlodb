@@ -5,6 +5,7 @@ const rimraf = require('rimraf');
 const fs = require('fs');
 const chalk = require('chalk');
 const lodash = require('lodash');
+const cfn = require('./common-functions');
 
 //Set Data Source
 function setsrc(src,callback) {
@@ -54,6 +55,7 @@ function createDb(dbname,callback) {
                         db_tracker = text.split("\n");
                         db_tracker.pop();
                 }
+                cfn.dbLog(true);
             }
         });
     }
@@ -152,6 +154,7 @@ function deldb(dbname,callback) {
                 else {
                     fs.truncateSync('./db_tracker.txt');
                 }
+                cfn.dbLog(false);
             }
         });
     }

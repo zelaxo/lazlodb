@@ -207,7 +207,7 @@ lazlo
     });
 
 lazlo
-    .command('show from <docname> <where> <prop> <operator> <val>', 'Compare properties to values')
+    .command('show from <docname> <where> <prop> <operator> <val>', 'Compare single property to single value')
     .action(function(args,cb) {
         let docname = args.docname;
         let where = args.where;
@@ -221,6 +221,101 @@ lazlo
         } else {
             let msg = 'Synatactical error detected !';
             lazlo.log(msg);
+        }
+        cb();
+    });
+
+lazlo
+    .command('pick from <docname> <where> <prop1> <operator1> <val1> <conjunction> <prop2> <operator2> <val2>', 'Compare dual properties to dual values')
+    .action(function(args,cb) {
+        let docname = args.docname;
+        let where = args.where;
+        let prop1 = args.prop1;
+        let operator1 = args.operator1;
+        let val1 = args.val1;
+        let prop2 = args.prop2;
+        let operator2 = args.operator2;
+        let val2 = args.val2;
+        let conjunction = args.conjunction;
+        if(where === 'where') {
+            sad.whereClause2(docname,prop1,operator1,val1,conjunction,prop2,operator2,val2,(msg) => {
+                lazlo.log(msg);
+            })
+        } else {
+            let msg = 'Synatactical error detected !';
+            lazlo.log(msg);
+        }
+        cb();
+    });
+
+lazlo
+    .command('update in <docname> <where> <ipar> <sign> <ivalue> <as> <par> <sign> <value>', 'Update a record')
+    .action((args,cb) => {
+        let docname = args.docname;
+        let where = args.where;
+        let ipar = args.ipar;
+        let sign = args.sign;
+        let ivalue = args.ivalue;
+        let as = args.as;
+        let par = args.par;
+        let value = args.value;
+        if(where === 'where' && sign === '=' && as === 'as') {
+            docfn.updateDoc(docname,ipar,ivalue,par,value,(msg,output) => {
+               lazlo.log(chalk.green.bold(msg));
+               if (output) lazlo.log(output);
+            });
+        } else {
+            let msg = 'Syntactical Error !';
+            lazlo.log(chalk.red.bold(msg));
+        }
+        cb();
+    });
+
+lazlo
+    .command('delete from <docname> <where> <par> <sign> <value>', 'Delete record')
+    .action((args,cb) => {
+        let docname = args.docname;
+        let where = args.where;
+        let par = args.par;
+        let sign = args.sign;
+        let value = args.value;
+        if(where === 'where' && sign === '=') {
+            docfn.delData(docname,par,value,(msg,output) => {
+               lazlo.log(chalk.green.bold(msg));
+               if (output) lazlo.log(output);
+            });
+        }
+        else {
+            let msg = 'Syntactical Error !';
+            lazlo.log(chalk.red.bold(msg));
+        }
+       cb();
+    });
+
+lazlo
+    .command('log','Prints the log')
+    .action((args,cb) => {
+        fs.readFile(config.get("logs.lazlo_log"),'utf8',(err, data) => {
+            if (err) lazlo.log(chalk.red.bold('Log not found or is inaccessible !'));
+            lazlo.log(data);
+        });
+        cb();
+    });
+
+lazlo
+    .command('show records of <date> <from> <docname>', 'Show records by date')
+    .action((args,cb) => {
+        let date = args.date;
+        let from = args.from;
+        let docname = args.docname;
+        if(from === 'from') {
+            docfn.recordsByDate(date,docname,(msg,output) => {
+                lazlo.log(chalk.green.bold(msg));
+                if (output) lazlo.log(output);
+            });
+        } else {
+            let msg = 'Syntactical Error !';
+            lazlo.log(chalk.red.bold(msg));
         }
         cb();
     });
