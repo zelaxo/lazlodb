@@ -1,10 +1,17 @@
 {
   "name": "lazlo",
-  "version": "1.0.0",
+  "version": "0.1",
   "main": "main.js",
-  "repository": "https://github.com/zaygozi/Lazlo.git",
+  "repository": "https://github.com/zaygozi/lazlodb.git",
   "author": "zaygo <zaygo@mail.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">=8"
+  },
+  "preferGlobal": true,
+  "bin": {
+    "lazlo": "./main.js"
+  },
   "dependencies": {
     "chalk": "^2.4.1",
     "edit-json-file": "^1.2.0",

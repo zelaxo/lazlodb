@@ -121,9 +121,9 @@ concat-map@0.0.1:
   integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
 
 core-js@^2.4.0, core-js@^2.5.0:
-  version "2.5.7"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
-  integrity sha512-RszJCAxg/PP6uzXVXL6BsxSXx/B05oJAQ2vkJRjyjrEcNVycaqOmNb5OTxZPE3xa5gwZduqza6L9JOCenh/Ecw==
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.1.tgz#87416ae817de957a3f249b3b5ca475d4aaed6042"
+  integrity sha512-L72mmmEayPJBejKIWe2pYtGis5r0tQ5NaJekdhyXgeMQTpJoBsH0NL4ElY2LfSoV15xeQWKQ+XTTOZdyero5Xg==
 
 d@1:
   version "1.0.0"
@@ -553,9 +553,9 @@ set-value@^0.4.0:
     to-object-path "^0.3.0"
 
 simple-node-logger@^0.93.40:
-  version "0.93.40"
-  resolved "https://registry.yarnpkg.com/simple-node-logger/-/simple-node-logger-0.93.40.tgz#49bbd823afef445690663acf4cbcedfe87f2d976"
-  integrity sha512-ByWh6D6DgXteLICr5Bhca5CIDxuGt7xOysulWPIrBcwTT6ZCNF4SrwmtIDhC+cSNlJsz/fGytn7mH2Zqyh9euA==
+  version "0.93.42"
+  resolved "https://registry.yarnpkg.com/simple-node-logger/-/simple-node-logger-0.93.42.tgz#ebc6893ef27a838f12dbd16a71e694976cb0f975"
+  integrity sha512-3Kh0egP+iYr/TSDOdbLEMgyd9o6XsBMk3xk4Ds0/dwoclgDOqdOygusBixcr6ls0nG5xTpwgWiatWfZXjCiCLA==
   dependencies:
     lodash "^4.17.10"
     moment "^2.20.1"

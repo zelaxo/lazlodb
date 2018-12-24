@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const lazlo = require('vorpal')();
 const ejf = require('edit-json-file');
 let config = ejf('./.config.json');
