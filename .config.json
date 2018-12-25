@@ -1,6 +1,6 @@
 {
   "db_src": {
-    "win32": "C://Users/arjun/Documents",
+    "win32": "C://Users/Public",
     "darwin": "/",
     "linux": "/opt"
   },

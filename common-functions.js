@@ -82,11 +82,11 @@ function docDeletionLog(docname, db) {
 
 module.exports.docDeletionLog = docDeletionLog;
 
-function dbLog(op) {
+function dbLog(dbname,op) {
     if (op === true) {
-        log.info(`DBC : ${db} created in ${config.get("db_src")} on `, new Date().toISOString().replace('T', '@').substr(0, 16));
+        log.info(`DBC : ${dbname} created in ${process.env.LAZLO_SOURCE} on `, new Date().toISOString().replace('T', '@').substr(0, 16));
     } else {
-        log.warn(`DBD : ${db} deleted from ${config.get("db_src")} on `, new Date().toISOString().replace('T', '@').substr(0, 16));
+        log.warn(`DBD : ${dbname} deleted from ${process.env.LAZLO_SOURCE} on `, new Date().toISOString().replace('T', '@').substr(0, 16));
     }
 }
 

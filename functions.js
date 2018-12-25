@@ -55,7 +55,7 @@ function createDb(dbname,callback) {
                         db_tracker = text.split("\n");
                         db_tracker.pop();
                 }
-                cfn.dbLog(true);
+                cfn.dbLog(dbname,true);
             }
         });
     }
@@ -154,7 +154,7 @@ function deldb(dbname,callback) {
                 else {
                     fs.truncateSync('./db_tracker.txt');
                 }
-                cfn.dbLog(false);
+                cfn.dbLog(dbname,false);
             }
         });
     }
