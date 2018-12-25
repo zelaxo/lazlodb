@@ -4,6 +4,7 @@ const lazlo = require('vorpal')();
 const ejf = require('edit-json-file');
 let config = ejf('./.config.json');
 const {chalk} = lazlo;
+const os = require('os');
 const fs = require('fs');
 const listcon = require('list-contents');
 const path = require('path');
@@ -12,7 +13,15 @@ const docfn = require('./doc-functions');
 const sad = require('./slice&dice');
 
 //Environment Variables
-process.env.LAZLO_SOURCE = config.get("db_src");
+if(os.platform() === 'win32') {
+    process.env.LAZLO_SOURCE = config.get("db_src.win32");
+}
+else if(os.platform() === 'darwin') {
+    process.env.LAZLO_SOURCE = config.get("db_src.darwin");
+}
+else {
+    process.env.LAZLO_SOURCE = config.get("db_src.linux");
+}
 
 //Global namespace
 global.db = null;  //Stores db name being currently used

@@ -76,7 +76,7 @@ function inserts(docname, input, callback) {
             fs.writeFile(p, buffer, (err) => {
                 if (err) throw err;
             });
-            msg = 'Data inserted !';
+            msg = 'Record inserted !';
             if (callback)
                 callback((chalk.green.bold(msg)));
             cfn.docEntryLog(1,docname,true);
@@ -93,7 +93,7 @@ function inserts(docname, input, callback) {
             fs.writeFile(p, buffer, (err) => {
                 if (err) throw err;
             });
-            msg = 'Data inserted !';
+            msg = 'Record inserted !';
             if (callback)
                 callback((chalk.green.bold(msg)));
             cfn.docEntryLog(1,docname,true);
@@ -130,7 +130,7 @@ function insert(docname, input, callback) {
             fs.writeFile(p, buffer, (err) => {
                 if (err) throw err;
             });
-            msg = 'Data inserted !';
+            msg = `${array.length} records inserted !`;
             if (callback)
                 callback((chalk.green.bold(msg)));
             cfn.docEntryLog(array.length,docname,true);
@@ -149,7 +149,7 @@ function insert(docname, input, callback) {
             fs.writeFile(p, buffer, (err) => {
                 if (err) throw err;
             });
-            msg = 'Data inserted !';
+            msg = `${array.length} records inserted !`;
             if (callback)
                 callback((chalk.green.bold(msg)));
             cfn.docEntryLog(array.length,docname,true);

@@ -10,7 +10,7 @@
   },
   "preferGlobal": true,
   "bin": {
-    "lazlo": "./main.js"
+    "lazlo": "bin/lazlo"
   },
   "dependencies": {
     "chalk": "^2.4.1",

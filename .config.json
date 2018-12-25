@@ -1,5 +1,9 @@
 {
-  "db_src": "C://Users/arjun/Documents",
+  "db_src": {
+    "win32": "C://Users/arjun/Documents",
+    "darwin": "/",
+    "linux": "/opt"
+  },
   "logs": {
     "lazlo_log": "./logs/lazlo.log"
   }
