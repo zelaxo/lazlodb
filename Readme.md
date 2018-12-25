@@ -32,4 +32,4 @@
 
 #### As I am a node js learner myself, all help & contribution is very well appreciated. If you find this idea or the underlying code useful, feel free to reuse it in your own projects.
 
-#### Refer the wiki for usage docs (Warning : Under Development)
+#### For usage info refer the [docs](https://github.com/zaygozi/lazlodb/wiki) (Warning : Under Development)
