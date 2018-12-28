@@ -3,7 +3,7 @@ let config = ejf('./.config.json');
 const uniqid = require('uniqid');
 const log = require('simple-node-logger').createSimpleFileLogger(config.get("logs.lazlo_log"));
 
-//operator comparison for where clause
+//operator comparison for simple where clause
 function whereComp(prop, operator, val) {
     let output = [];
 
@@ -82,7 +82,7 @@ function docDeletionLog(docname, db) {
 
 module.exports.docDeletionLog = docDeletionLog;
 
-function dbLog(dbname,op) {
+function dbLog(dbname, op) {
     if (op === true) {
         log.info(`DBC : ${dbname} created in ${process.env.LAZLO_SOURCE} on `, new Date().toISOString().replace('T', '@').substr(0, 16));
     } else {
@@ -97,3 +97,51 @@ function docUpdateLog(id, docname) {
 }
 
 module.exports.docUpdateLog = docUpdateLog;
+
+// operator comparison for propWhere
+function propComp(prop1, operator, prop2) {
+    let output = [];
+
+    if (operator === '=') {
+        cache.forEach((obj) => {
+            if (obj[prop1] === obj[prop2]) {
+                output.push(obj);
+            }
+        });
+    } else if (operator === '!=') {
+        cache.forEach((obj) => {
+            if (obj[prop1] !== obj[prop2]) {
+                output.push(obj);
+            }
+        });
+    } else if (operator === '>') {
+        cache.forEach((obj) => {
+            if (obj[prop1] > obj[prop2]) {
+                output.push(obj);
+            }
+        });
+    } else if (operator === '<') {
+        cache.forEach((obj) => {
+            if (obj[prop1] < obj[prop2]) {
+                output.push(obj);
+            }
+        });
+    } else if (operator === '>=') {
+        cache.forEach((obj) => {
+            if (obj[prop1] > obj[prop2] || obj[prop1] === obj[prop2]) {
+                output.push(obj);
+            }
+        });
+    } else if (operator === '<=') {
+        cache.forEach((obj) => {
+            if (obj[prop1] < obj[prop2] || obj[prop1] === obj[prop2]) {
+                output.push(obj);
+            }
+        });
+    } else {
+        output = null;
+    }
+    return output;
+}
+
+module.exports.propComp = propComp;

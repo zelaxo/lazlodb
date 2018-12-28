@@ -27,7 +27,7 @@ else {
 global.db = null;  //Stores db name being currently used
 global.db_tracker = null;
 global.cache = [];
-global.current_doc = null;  //Stores doc name being currently used
+global.current_doc = null;  //Stores doc name being currently stored in cache
 
 //Reading db_tracker log
 let text = fs.readFileSync('./db_tracker.txt').toString();
@@ -330,6 +330,26 @@ lazlo
         }
         cb();
     });
+
+lazlo
+    .command('identify from <docname> <where> <prop1> <operator> <prop2>', 'Compare two properties')
+    .action(function(args,cb) {
+        let docname = args.docname;
+        let where = args.where;
+        let prop1 = args.prop1;
+        let operator = args.operator;
+        let prop2 = args.prop2;
+        if(where === 'where') {
+            sad.propWhere(docname,prop1,operator,prop2,(msg) => {
+                lazlo.log(msg);
+            })
+        } else {
+            let msg = 'Synatactical error detected !';
+            lazlo.log(chalk.red.bold(msg));
+        }
+        cb();
+    });
+
 
 lazlo
     .delimiter(chalk.magenta.bold('lazlo =>'))

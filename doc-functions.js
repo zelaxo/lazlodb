@@ -390,3 +390,14 @@ function recordsByDate(date,docname,callback) {
     }
 }
 module.exports.recordsByDate = recordsByDate;
+
+//check if a property exists in atleast one record in a doc
+function propExists(prop) {
+    let exists = false;
+    cache.forEach((obj) => {
+        if(obj.hasOwnProperty(prop))
+            return exists = true;
+    });
+    return exists;
+}
+module.exports.propExists = propExists;

@@ -1,3 +1,4 @@
+const os = require('os');
 const ejf = require('edit-json-file');
 let config = ejf('./.config.json');
 const mkdir = require('mkdirp');
@@ -11,7 +12,7 @@ const cfn = require('./common-functions');
 function setsrc(src,callback) {
     let msg;
     if(fs.existsSync(src) && src!==process.env.LAZLO_SOURCE) {
-        config.set("db_src",src);
+        config.set(`db_src.${os.platform()}`,src);
         config.save();
         process.env.LAZLO_SOURCE = src;
         fs.writeFileSync('./db_tracker.txt','');

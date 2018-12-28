@@ -6,6 +6,7 @@ const chalk = require('chalk');
 const lodash = require('lodash');
 
 const cfn = require('./common-functions');
+const docfn = require('./doc-functions');
 
 //simple where clause (Compare single property with single value)
 function whereClause(docname, prop, operator, val, callback) {
@@ -15,14 +16,21 @@ function whereClause(docname, prop, operator, val, callback) {
     if (db !== null && fs.existsSync(p)) {
         if (cache.length !== 0 && current_doc === docname) {
             //fast retrieval using cache
-            output = cfn.whereComp(prop, operator, val);
-            if (output !== null) {
-                if (callback)
-                    callback(output)
-            } else {
-                msg = 'Operator not recognized !';
+            if(!docfn.propExists(prop)) {
+                msg = 'Property does not exist in any record !';
                 if (callback)
                     callback((chalk.red.bold(msg)));
+            }
+            else {
+                output = cfn.whereComp(prop, operator, val);
+                if (output !== null) {
+                    if (callback)
+                        callback(output)
+                } else {
+                    msg = 'Operator not recognized !';
+                    if (callback)
+                        callback((chalk.red.bold(msg)));
+                }
             }
         } else {
             //normal retrieval
@@ -35,14 +43,21 @@ function whereClause(docname, prop, operator, val, callback) {
                     } else {
                         cache = msgpack.decode(data);
                         current_doc = docname;
-                        output = cfn.whereComp(prop, operator, val);
-                        if (output !== null) {
-                            if (callback)
-                                callback(output)
-                        } else {
-                            msg = 'Operator not recognized !';
+                        if(!docfn.propExists(prop)) {
+                            msg = 'Property does not exist in any record !';
                             if (callback)
                                 callback((chalk.red.bold(msg)));
+                        }
+                        else {
+                            output = cfn.whereComp(prop, operator, val);
+                            if (output !== null) {
+                                if (callback)
+                                    callback(output)
+                            } else {
+                                msg = 'Operator not recognized !';
+                                if (callback)
+                                    callback((chalk.red.bold(msg)));
+                            }
                         }
                     }
                 });
@@ -69,25 +84,110 @@ function whereClause2(docname, prop1, operator1, val1, conjunction, prop2, opera
     if (db !== null && fs.existsSync(p)) {
         if (cache.length !== 0 && current_doc === docname) {
             //fast retrieval using cache
-            output1 = cfn.whereComp(prop1, operator1, val1);
-            output2 = cfn.whereComp(prop2, operator2, val2);
-            if(output1 === null || output2 === null) {
-                msg = 'Operator not recognized !';
+            if(!docfn.propExists(prop1) || !docfn.propExists(prop2)) {
+                msg = 'One or more properties do not exist in any record !';
                 if (callback)
                     callback((chalk.red.bold(msg)));
+            }
+            else {
+                output1 = cfn.whereComp(prop1, operator1, val1);
+                output2 = cfn.whereComp(prop2, operator2, val2);
+                if(output1 === null || output2 === null) {
+                    msg = 'Operator not recognized !';
+                    if (callback)
+                        callback((chalk.red.bold(msg)));
+                } else {
+                    if(conjunction === 'and') {
+                        let result = lodash.intersection(output1,output2);
+                        if(callback)
+                            callback(result)
+                    }
+                    else if(conjunction === 'or') {
+                        let result = lodash.union(output1,output2);
+                        if(callback)
+                            callback(result)
+                    }
+                    else {
+                        msg = 'Conjunction not recognized !';
+                        if (callback)
+                            callback((chalk.red.bold(msg)));
+                    }
+                }
+            }
+        } else {
+            //normal retrieval
+            if (fs.statSync(p).size !== 0) {
+                fs.readFile(p, (err, data) => {
+                    if (err) {
+                        msg = 'Data seems to be corrupted !';
+                        if (callback)
+                            callback((chalk.red.bold(msg)));
+                    } else {
+                        cache = msgpack.decode(data);
+                        current_doc = docname;
+                        if (!docfn.propExists(prop1) || !docfn.propExists(prop2)) {
+                            msg = 'One or more properties do not exist in any record !';
+                            if (callback)
+                                callback((chalk.red.bold(msg)));
+                        } else {
+                            output1 = cfn.whereComp(prop1, operator1, val1);
+                            output2 = cfn.whereComp(prop2, operator2, val2);
+                            if (output1 === null || output2 === null) {
+                                msg = 'Operator not recognized !';
+                                if (callback)
+                                    callback((chalk.red.bold(msg)));
+                            } else {
+                                if (conjunction === 'and') {
+                                    let result = lodash.intersection(output1, output2);
+                                    if (callback)
+                                        callback(result)
+                                } else if (conjunction === 'or') {
+                                    let result = lodash.union(output1, output2);
+                                    if (callback)
+                                        callback(result)
+                                } else {
+                                    msg = 'Conjunction not recognized !';
+                                    if (callback)
+                                        callback((chalk.red.bold(msg)));
+                                }
+                            }
+                        }
+                    }
+                });
             } else {
-                if(conjunction === 'and') {
-                    let result = lodash.intersection(output1,output2);
-                    if(callback)
-                        callback(result)
-                }
-                else if(conjunction === 'or') {
-                    let result = lodash.union(output1,output2);
-                    if(callback)
-                        callback(result)
-                }
-                else {
-                    msg = 'Conjunction not recognized !';
+                msg = 'Document is empty !';
+                if (callback)
+                    callback((chalk.red.bold(msg)));
+            }
+        }
+    } else {
+        msg = 'No database selected or the document does not exist !';
+        if (callback)
+            callback((chalk.red.bold(msg)));
+    }
+}
+module.exports.whereClause2 = whereClause2;
+
+// compare properties in a record
+function propWhere(docname, prop1, operator, prop2, callback) {
+    let msg;
+    let output;
+    let p = `${process.env.LAZLO_SOURCE}/${db}/${docname}.laz`;
+    if (db !== null && fs.existsSync(p)) {
+        if (cache.length !== 0 && current_doc === docname) {
+            //fast retrieval using cache
+            if(!docfn.propExists(prop1) || !docfn.propExists(prop2)) {
+                msg = 'One or more properties do not exist in any record !';
+                if (callback)
+                    callback((chalk.red.bold(msg)));
+            }
+            else {
+                output = cfn.propComp(prop1, operator, prop2);
+                if (output !== null) {
+                    if (callback)
+                        callback(output)
+                } else {
+                    msg = 'Operator not recognized !';
                     if (callback)
                         callback((chalk.red.bold(msg)));
                 }
@@ -103,30 +203,22 @@ function whereClause2(docname, prop1, operator1, val1, conjunction, prop2, opera
                     } else {
                         cache = msgpack.decode(data);
                         current_doc = docname;
-                        output1 = cfn.whereComp(prop1, operator1, val1);
-                        output2 = cfn.whereComp(prop2, operator2, val2);
-                        if(output1 === null || output2 === null) {
-                            msg = 'Operator not recognized !';
+                        if (!docfn.propExists(prop1) || !docfn.propExists(prop2)) {
+                            msg = 'One or more properties do not exist in any record !';
                             if (callback)
                                 callback((chalk.red.bold(msg)));
                         } else {
-                            if(conjunction === 'and') {
-                                let result = lodash.intersection(output1,output2);
-                                if(callback)
-                                    callback(result)
-                            }
-                            else if(conjunction === 'or') {
-                                let result = lodash.union(output1,output2);
-                                if(callback)
-                                    callback(result)
-                            }
-                            else {
-                                msg = 'Conjunction not recognized !';
+                            output = cfn.propComp(prop1, operator, prop2);
+                            if (output !== null) {
+                                if (callback)
+                                    callback(output)
+                            } else {
+                                msg = 'Operator not recognized !';
                                 if (callback)
                                     callback((chalk.red.bold(msg)));
                             }
                         }
-                      }
+                    }
                 });
             } else {
                 msg = 'Document is empty !';
@@ -140,4 +232,4 @@ function whereClause2(docname, prop1, operator1, val1, conjunction, prop2, opera
             callback((chalk.red.bold(msg)));
     }
 }
-module.exports.whereClause2 = whereClause2;
+module.exports.propWhere = propWhere;
