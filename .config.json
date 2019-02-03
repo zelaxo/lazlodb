@@ -5,6 +5,6 @@
     "linux": "/opt"
   },
   "logs": {
-    "lazlo_log": "./logs/lazlo.log"
+    "lazlo_log": "../logs/lazlo.log"
   }
 }
