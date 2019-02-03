@@ -2,15 +2,15 @@
 
 const lazlo = require('vorpal')();
 const ejf = require('edit-json-file');
-let config = ejf('./.config.json');
+let config = ejf('../.config.json');
 const {chalk} = lazlo;
 const os = require('os');
 const fs = require('fs');
 const listcon = require('list-contents');
 const path = require('path');
-const functions = require('./functions');
-const docfn = require('./doc-functions');
-const sad = require('./slice&dice');
+const functions = require('../functions');
+const docfn = require('../doc-functions');
+const sad = require('../slice&dice');
 
 //Environment Variables
 if(os.platform() === 'win32') {
@@ -30,7 +30,7 @@ global.cache = [];
 global.current_doc = null;  //Stores doc name being currently stored in cache
 
 //Reading db_tracker log
-let text = fs.readFileSync('./db_tracker.txt').toString();
+let text = fs.readFileSync('../db_tracker.txt').toString();
 if (text === null) {} else {
     db_tracker = text.split("\n");
     db_tracker.pop();
