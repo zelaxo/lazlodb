@@ -2,6 +2,16 @@
 
 ### Lazlo is a portable, compact & serverless NoSql database built using Node JS & MessagePack
 
+## Installation
+* Full Database
+```sh
+npm install -g lazlodb
+```
+* Lightweight Node JS Library
+```sh
+npm install lazlo-node
+```
+
 ## Storage
 * Data is stored in **.laz** files in MessagePack encoded form. As MessagePack is smaller than JSON, it takes less space & hence the files are compact.
 * Each **.laz** file represents a **document** (or a table in sql).
@@ -17,12 +27,6 @@
 * Powerful inbuilt logger which logs all the transactions.
 * Special features (Eg. Display all records in a document for a given creation date).
 
-## How can I contribute?
-#### I am a CS student & this project is being developed as a part of my final year project. There is a lot of work left, but these are some of the milestones I've set :
-* Create a node js library for lazlo.
-* Run lazlo on a server (currently only works as a local database)
-* Implement buckets (You will probably see this word in the code. A bucket will act like a unique folder in the database which will hold the media files connected to a record).
-
 ## Major third party libraries used :
 * vorpal js
 * msgpack-lite
@@ -30,6 +34,4 @@
 * simple-node-logger
 * edit-json-file
 
-#### As I am a node js learner myself, all help & contribution is very well appreciated. If you find this idea or the underlying code useful, feel free to reuse it in your own projects.
-
-#### For usage info refer the [docs](https://github.com/zaygozi/lazlodb/wiki) (Warning : Under Development)
+#### For usage info refer the [docs](https://github.com/zaygozi/lazlodb/wiki)
