@@ -2,7 +2,7 @@
 
 const lazlo = require('vorpal')();
 const ejf = require('edit-json-file');
-let config = ejf('../.config.json');
+let config = ejf(`${__dirname}/.config.json`);
 const {chalk} = lazlo;
 const os = require('os');
 const fs = require('fs');
@@ -30,7 +30,7 @@ global.cache = [];
 global.current_doc = null;  //Stores doc name being currently stored in cache
 
 //Reading db_tracker log
-let text = fs.readFileSync('../db_tracker.txt').toString();
+let text = fs.readFileSync(`${__dirname}/db_tracker.txt`).toString();
 if (text === null) {} else {
     db_tracker = text.split("\n");
     db_tracker.pop();
@@ -306,7 +306,7 @@ lazlo
 lazlo
     .command('log','Prints the log')
     .action((args,cb) => {
-        fs.readFile(config.get("logs.lazlo_log"),'utf8',(err, data) => {
+        fs.readFile(`${__dirname}/logs/lazlo.log`,'utf8',(err, data) => {
             if (err) lazlo.log(chalk.red.bold('Log not found or is inaccessible !'));
             lazlo.log(data);
         });

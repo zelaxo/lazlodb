@@ -1,6 +1,6 @@
 {
   "name": "lazlodb",
-  "version": "1.0.0",
+  "version": "1.0.9",
   "description": "Portable, Compact & Serverless NoSQL Database",
   "main": "./bin/main.js",
   "repository": "https://github.com/zaygozi/lazlodb.git",

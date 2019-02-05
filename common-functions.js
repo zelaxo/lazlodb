@@ -1,7 +1,5 @@
-const ejf = require('edit-json-file');
-let config = ejf('../.config.json');
 const uniqid = require('uniqid');
-const log = require('simple-node-logger').createSimpleFileLogger(config.get("logs.lazlo_log"));
+const log = require('simple-node-logger').createSimpleFileLogger(`${__dirname}/bin/logs/lazlo.log`);
 
 //operator comparison for simple where clause
 function whereComp(prop, operator, val) {
