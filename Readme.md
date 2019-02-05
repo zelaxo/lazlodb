@@ -7,6 +7,10 @@
 ```sh
 npm install -g lazlodb
 ```
+* Execute Cli
+```sh
+lazlo
+```
 * Lightweight Node JS Library (Official Repository : [lazlo-node](https://github.com/zaygozi/lazlo-node))
 ```sh
 npm install lazlo-node
