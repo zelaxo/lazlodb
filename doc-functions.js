@@ -61,43 +61,48 @@ function inserts(docname, input, callback) {
     let msg;
     let p = `${process.env.LAZLO_SOURCE}/${db}/${docname}.laz`;
     if (db !== null && fs.existsSync(p)) {
+        let errorExists = false;
         try {
             object = JSON.parse(input);
         } catch (e) {
+            errorExists = true;
             msg = 'Syntactical error detected !';
             if (callback)
                 callback((chalk.red.bold(msg)));
         }
-        if (cache.length !== 0 && current_doc === docname) {
-            //Using preloaded cache data for fast insertion
-            object._id = cfn.idgen();
-            cache.push(object);
-            let buffer = msgpack.encode(cache);
-            fs.writeFile(p, buffer, (err) => {
-                if (err) throw err;
-            });
-            msg = 'Record inserted !';
-            if (callback)
-                callback((chalk.green.bold(msg)));
-            cfn.docEntryLog(1,docname,true);
-        } else {
-            //Normal Insertion
-            if (fs.statSync(p).size !== 0) {
-                let buffer = fs.readFileSync(p);
-                cache = msgpack.decode(buffer);
+        if(errorExists === false) {
+            if (cache.length !== 0 && current_doc === docname) {
+                //Using preloaded cache data for fast insertion
+                object._id = cfn.idgen();
+                cache.push(object);
+                let buffer = msgpack.encode(cache);
+                fs.writeFile(p, buffer, (err) => {
+                    if (err) throw err;
+                });
+                msg = 'Record inserted !';
+                if (callback)
+                    callback((chalk.green.bold(msg)));
+                cfn.docEntryLog(1,docname,true);
+            } else {
+                //Normal Insertion
+                if (fs.statSync(p).size !== 0) {
+                    let buffer = fs.readFileSync(p);
+                    cache = msgpack.decode(buffer);
+                }
+                current_doc = docname;
+                object._id = cfn.idgen();
+                cache.push(object);
+                let buffer = msgpack.encode(cache);
+                fs.writeFile(p, buffer, (err) => {
+                    if (err) throw err;
+                });
+                msg = 'Record inserted !';
+                if (callback)
+                    callback((chalk.green.bold(msg)));
+                cfn.docEntryLog(1,docname,true);
             }
-            current_doc = docname;
-            object._id = cfn.idgen();
-            cache.push(object);
-            let buffer = msgpack.encode(cache);
-            fs.writeFile(p, buffer, (err) => {
-                if (err) throw err;
-            });
-            msg = 'Record inserted !';
-            if (callback)
-                callback((chalk.green.bold(msg)));
-            cfn.docEntryLog(1,docname,true);
         }
+
     } else {
         msg = 'No database selected or the document does not exist !';
         if (callback)
@@ -113,47 +118,52 @@ function insert(docname, input, callback) {
     let msg;
     let p = `${process.env.LAZLO_SOURCE}/${db}/${docname}.laz`;
     if (db !== null && fs.existsSync(p)) {
+        let errorExists = false;
         try {
             array = JSON.parse(input);
         } catch (e) {
+            errorExists = true;
             msg = 'Syntactical error detected !';
             if (callback)
                 callback((chalk.red.bold(msg)));
         }
-        if (cache.length !== 0 && current_doc === docname) {
-            //Using preloaded cache data for fast insertion
-            array.forEach((object) => {
-                object._id = cfn.idgen();
-                cache.push(object);
-            });
-            let buffer = msgpack.encode(cache);
-            fs.writeFile(p, buffer, (err) => {
-                if (err) throw err;
-            });
-            msg = `${array.length} records inserted !`;
-            if (callback)
-                callback((chalk.green.bold(msg)));
-            cfn.docEntryLog(array.length,docname,true);
-        } else {
-            //Normal Insertion
-            if (fs.statSync(p).size !== 0) {
-                let buffer = fs.readFileSync(p);
-                cache = msgpack.decode(buffer);
+        if(errorExists === false) {
+            if (cache.length !== 0 && current_doc === docname) {
+                //Using preloaded cache data for fast insertion
+                array.forEach((object) => {
+                    object._id = cfn.idgen();
+                    cache.push(object);
+                });
+                let buffer = msgpack.encode(cache);
+                fs.writeFile(p, buffer, (err) => {
+                    if (err) throw err;
+                });
+                msg = `${array.length} records inserted !`;
+                if (callback)
+                    callback((chalk.green.bold(msg)));
+                cfn.docEntryLog(array.length,docname,true);
+            } else {
+                //Normal Insertion
+                if (fs.statSync(p).size !== 0) {
+                    let buffer = fs.readFileSync(p);
+                    cache = msgpack.decode(buffer);
+                }
+                current_doc = docname;
+                array.forEach((object) => {
+                    object._id = cfn.idgen();
+                    cache.push(object);
+                });
+                let buffer = msgpack.encode(cache);
+                fs.writeFile(p, buffer, (err) => {
+                    if (err) throw err;
+                });
+                msg = `${array.length} records inserted !`;
+                if (callback)
+                    callback((chalk.green.bold(msg)));
+                cfn.docEntryLog(array.length,docname,true);
             }
-            current_doc = docname;
-            array.forEach((object) => {
-                object._id = cfn.idgen();
-                cache.push(object);
-            });
-            let buffer = msgpack.encode(cache);
-            fs.writeFile(p, buffer, (err) => {
-                if (err) throw err;
-            });
-            msg = `${array.length} records inserted !`;
-            if (callback)
-                callback((chalk.green.bold(msg)));
-            cfn.docEntryLog(array.length,docname,true);
         }
+
     } else {
         msg = 'No database selected or the document does not exist !';
         if (callback)

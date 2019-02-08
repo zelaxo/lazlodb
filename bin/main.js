@@ -25,7 +25,7 @@ else {
 
 //Global namespace
 global.db = null;  //Stores db name being currently used
-global.db_tracker = null;
+global.db_tracker = [];
 global.cache = [];
 global.current_doc = null;  //Stores doc name being currently stored in cache
 

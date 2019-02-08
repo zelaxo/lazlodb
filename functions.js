@@ -39,7 +39,7 @@ function createDb(dbname,callback) {
     let msg;
     let p = `${process.env.LAZLO_SOURCE}/${dbname}`;
     if(fs.existsSync(p)) {
-        msg = `Database ${dbname} already exists in the current location !`;
+        msg = `Database ${dbname} already exists in the current location ! If its not listed then use track to track the database !`;
         if (callback)
             callback(null, chalk.red.bold(msg));
     }
@@ -86,15 +86,28 @@ function trackdb(dbname,callback) {
     let msg;
     let p = `${process.env.LAZLO_SOURCE}/${dbname}`;
     if(fs.existsSync(p)) {
-        msg = `Database ${dbname} is being tracked`;
-        fs.appendFileSync(`${__dirname}/bin/db_tracker.txt`,dbname+'\n');
-        let text = fs.readFileSync(`${__dirname}/bin/db_tracker.txt`).toString();
-        if (text === null) {} else  {
-            db_tracker = text.split("\n");
-            db_tracker.pop();
+        let beingTracked = false;
+        db_tracker.forEach((entry) => {
+            if(entry === dbname) {
+                beingTracked = true;
+                msg = `Database ${dbname} is already being tracked`;
+                if(callback)
+                    callback(chalk.red.bold(msg))
+            }
+        });
+
+        if(beingTracked === false) {
+            msg = `Database ${dbname} is being tracked`;
+            fs.appendFileSync(`${__dirname}/bin/db_tracker.txt`,dbname+'\n');
+            let text = fs.readFileSync(`${__dirname}/bin/db_tracker.txt`).toString();
+            if (text === null) {} else  {
+                db_tracker = text.split("\n");
+                db_tracker.pop();
+            }
+            if(callback)
+                callback(chalk.green.bold(msg))
         }
-        if(callback)
-            callback(chalk.green.bold(msg))
+
     }
     else {
         msg = `Database ${dbname} does not exist in the current data source`;
