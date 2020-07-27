@@ -25,7 +25,7 @@ npm install lazlo-node
 * All documents exist in a database, which is essentially a folder being tracked by lazlo.
 
 ## Features
-* Databases do not require an isolated environment. They can exist anywhere, even in your cloud folder (this will sync your database to the cloud).
+* Databases do not require an isolated environment. They can exist anywhere, even in your code repository or cloud folder.
 * Very easy to use.
 * Multiple commands for the same operation (Eg. **newdoc** & **create doc** both will create a new document).
 * Inbuilt caching system caches recently queried documents leading to faster responses.
